@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,13 @@
 <body>
 
   <h1>Random Zen Quote</h1>
-  <button onclick="fetchQuote()">Fetch Quote</button>
+  <button id="fetchQuoteBtn">Fetch Quote</button>
+  <button id="deleteQuoteBtn">Delete Quote</button>
   <div id="quote"></div>
+  <div id="localQuotes">
+    <h2>Saved Quotes</h2>
+    <ul id="quoteList"></ul>
+  </div>
 
   <script src="script.js"></script>
 </body>
