@@ -1,73 +1,81 @@
-const API_URL = 'https://zenquotes.io/api/random';
-const LOCAL_STORAGE_KEY = 'savedQuotes';
+const API_URL = 'https://pokeapi.co/api/v2/pokemon';
+const LOCAL_STORAGE_KEY = 'savedPokemon';
 
-function loadSavedQuotes() {
+function loadSavedPokemons() {
   return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
 }
 
-//UTILITY FUNCTION TO LOAD SAVED QUOTES FROM LocalStorage
-function saveQuotesToLocalStorage(quotes) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(quotes));
+//UTILITY FUNCTION TO LOAD SAVED POKEMON FROM LocalStorage
+function savePokemonToLocalStorage(pokemon) {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pokemon));
 }
+DATA
+//DISPLAY SAVED POKEMON FROM LocalStorage
+function displaySavedPokemons() {
+  const savedPokemons = loadSavedPokemons();
+  const pokemonList = document.getElementById('pokemonList');
+  pokemonList.innerHTML = ''; //CLEARS EXISTING LIST ITEMS
 
-//DISPLAY SAVED QUOTES FROM LocalStorage
-function displaySavedQuotes() {
-  const savedQuotes = loadSavedQuotes();
-  const quoteList = document.getElementById('quoteList');
-  quoteList.innerHTML = ''; //CLEARS EXISTING LIST ITEMS
 
-  savedQuotes.forEach((quote, index) => {
+  if (savedPokemons.length === 0) {
+    pokemonList.innerHTML = '<li>No saved Pokemon</li>';
+  } else {
+
+  savedPokemons.forEach((pokemon, index) => {
     const li = document.createElement('li');
-    li.textContent = `"${quote.content}" - ${quote.author}`;
+    li.textContent = `${pokemon.name} - ${pokemon.weight}`;
     li.dataset.index = index; //ADD INDEX FOR POTENTIAL DELETION
-    quoteList.appendChild(li);
+    pokemonList.appendChild(li);
   });
 }
+}
 
-// Function to fetch a random Zen quote from the ZenQuotes API
-async function fetchQuote() {
+//FUNCTION TO FETCH A RANDOM POKEMON FROM the POKE API
+async function fetchPokemon() {
     try {
-      console.log("Fetching quote...")
-      const response = await fetch(API_URL); // FETCH DATA FROM the API using async/await
+      console.log("Fetching Pokemon...")
+      
+      const randomId = Math.floor(Math.random() * 100) + 1; //RANDOMLY SELECTS AN ID FROM 1 TO 100
+      const response = await fetch(`API_URL/${randomId}`); // FETCH DATA FROM the API using THE RANDOM ID
       if (!response.ok) {   //CHECK IF RESPONSE IS OK, ELSE THROW AN ERROR
-        throw new Error(`Failed to fetch quote.`);
+        throw new Error('Failed to fetch Pokemon. Please try again later.');
       }
         const data = await response.json();  // PARSE THE RESPONSE as JSON
 
-      //DISPLAY FETCHED QUOTE
-      const quote = data[0]; //data[0] IS THE ARRAY WITH THE QUOTE AND AUTHOR
-      document.getElementById('quote').innerHTML = `"${quote.q}" - ${quote.a}`;
+      //DISPLAY FETCHED POKEMON
+      const pokemon = data; //data[0] IS THE ARRAY WITH THE NAME AND WEIGHT
+      document.getElementById('pokemon').innerHTML = `${pokemon.name} - ${pokemon.weight}`;
       
-      const savedQuotes = loadSavedQuotes();
-      savedQuotes.push({content: quote.q, author: quote.a});
-      saveQuotesToLocalStorage(savedQuotes);
+      const savedPokemons = loadSavedPokemons();
+      savedPokemons.push({name: data.name, weight: data.weight});
+      savePokemonsToLocalStorage(savedPokemons);
 
-      displaySavedQuotes(); //REFRESH DISPLAYED SAVED QUOTES
+      displaySavedPokemons(); //REFRESH DISPLAYED SAVED POKEMON
 
       } catch (error) {
-        console.error('Error fetching quote:', error);
-        document.getElementById('quote').innerHTML = 'Failed to fetch quote. Please try again.';
+        console.error('Error fetching Pokemon:', error);
+        document.getElementById('pokemon').innerHTML = 'Failed to fetch Pokemon. Please try again.';
       }
     }
 
-function deleteLastQuote() {
-  const savedQuotes = loadSavedQuotes();
-  if (savedQuotes.length > 0) {
-    savedQuotes.pop(); //REMOVES THE LAST QUOTE
-    saveQuotesToLocalStorage(savedQuotes);
-    displaySavedQuotes();
+function deleteLastPokemon() {
+  const savedPokemons = loadSavedPokemons();
+  if (savedPokemons.length > 0) {
+    savedPokemons.pop(); //REMOVES THE LAST POKEMON
+    savePokemonsToLocalStorage(savedPokemons);
+    displaySavedPokemons();
   } else {
-    alert(`No quotes to delete!`);
+    alert(`No Pokemon to delete!`);
   }
 }
 
 //INITIALIZE APP AND BIND EVENT LISTENERS
 function init() {
-  document.getElementById('fetchQuoteBtn').addEventListener('click', fetchQuote);
-  document.getElementById('deleteQuoteBtn').addEventListener('click', deleteLastQuote);
+  document.getElementById('fetchPokemonBtn').addEventListener('click', fetchPokemon);
+  document.getElementById('deletePokemonBtn').addEventListener('click', deleteLastPokemon);
 
-//DISPLAY SAVED QUOTES ON LOAD
-  displaySavedQuotes();
+//DISPLAY SAVED POKEMON ON LOAD
+  displaySavedPokemons();
 }
 
 init();
