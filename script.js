@@ -9,7 +9,7 @@ function loadSavedPokemons() {
 function savePokemonToLocalStorage(pokemon) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pokemon));
 }
-DATA
+
 //DISPLAY SAVED POKEMON FROM LocalStorage
 function displaySavedPokemons() {
   const savedPokemons = loadSavedPokemons();
@@ -36,19 +36,19 @@ async function fetchPokemon() {
       console.log("Fetching Pokemon...")
       
       const randomId = Math.floor(Math.random() * 100) + 1; //RANDOMLY SELECTS AN ID FROM 1 TO 100
-      const response = await fetch(`API_URL/${randomId}`); // FETCH DATA FROM the API using THE RANDOM ID
+      const response = await fetch(`${API_URL}/${randomId}`); // FETCH DATA FROM the API using THE RANDOM ID
       if (!response.ok) {   //CHECK IF RESPONSE IS OK, ELSE THROW AN ERROR
         throw new Error('Failed to fetch Pokemon. Please try again later.');
       }
         const data = await response.json();  // PARSE THE RESPONSE as JSON
 
       //DISPLAY FETCHED POKEMON
-      const pokemon = data; //data[0] IS THE ARRAY WITH THE NAME AND WEIGHT
+      const pokemon = data;
       document.getElementById('pokemon').innerHTML = `${pokemon.name} - ${pokemon.weight}`;
       
       const savedPokemons = loadSavedPokemons();
-      savedPokemons.push({name: data.name, weight: data.weight});
-      savePokemonsToLocalStorage(savedPokemons);
+      savedPokemons.push({name: pokemon.name, weight: pokemon.weight});
+      savePokemonToLocalStorage(savedPokemons);
 
       displaySavedPokemons(); //REFRESH DISPLAYED SAVED POKEMON
 
@@ -62,7 +62,7 @@ function deleteLastPokemon() {
   const savedPokemons = loadSavedPokemons();
   if (savedPokemons.length > 0) {
     savedPokemons.pop(); //REMOVES THE LAST POKEMON
-    savePokemonsToLocalStorage(savedPokemons);
+    savePokemonToLocalStorage(savedPokemons);
     displaySavedPokemons();
   } else {
     alert(`No Pokemon to delete!`);
