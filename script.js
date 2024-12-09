@@ -19,7 +19,7 @@ function displaySavedPokemons() {
 
 
   if (savedPokemons.length === 0) {
-    pokemonList.innerHTML = '<li>No saved Pokemon</li>';
+    pokemonList.innerHTML = '<li>No saved Pokémon</li>';
   } else {
 
   savedPokemons.forEach((pokemon, index) => {
@@ -35,12 +35,12 @@ function displaySavedPokemons() {
 //FUNCTION TO FETCH A RANDOM POKEMON FROM the POKE API
 async function fetchPokemon() {
     try {
-      console.log("Fetching Pokemon...")
+      console.log("Fetching Pokémon...")
       
       const randomId = Math.floor(Math.random() * 100) + 1; //RANDOMLY SELECTS AN ID FROM 1 TO 100
       const response = await fetch(`${API_URL}/${randomId}`); // FETCH DATA FROM the API using THE RANDOM ID
       if (!response.ok) {   //CHECK IF RESPONSE IS OK, ELSE THROW AN ERROR
-        throw new Error('Failed to fetch Pokemon. Please try again.');
+        throw new Error('Failed to fetch Pokémon. Please try again.');
       }
         const data = await response.json();  // PARSE THE RESPONSE as JSON
 
@@ -60,9 +60,35 @@ async function fetchPokemon() {
 
       } catch (error) {
         console.error('Error fetching Pokemon:', error);
-        document.getElementById('pokemon').innerHTML = 'Failed to fetch Pokemon. Please try again.';
+        document.getElementById('pokemon').innerHTML = 'Failed to fetch Pokémon. Please try again.';
       }
     }
+
+//FETCH MULTIPLE POKEMON SIMULTANEOUSLY USING Promise.all()
+function fetchMultiplePokemon() {
+  const promises = [1, 2, 3].map((id) =>
+  fetch(`${API_URL}/${id}`).then((response) => response.json())
+);
+
+Promise.all(promises)
+  .then((results)=> {
+    console.log('All Pokemon fetched:', results);
+  })
+  .catch((error) => console.error('Error fetching multiple Pokémon', error));
+}
+
+//FETCH MULTIPLE POKEMON BUT USE Promise.any() FOR THE FIRST SUCCESS
+function fetchAnyPokemon() {
+  const promises = [101, 102, 103].map((id) =>
+    fetch(`${API_URL}/${id}`).then((response) => response.json())
+  );
+
+  Promise.any(promises)
+    .then((firstResult) => {
+      console.log('First successful Pokémon:', firstResult);
+    })
+    .catch((error) => console.error('Error fetching any Pokémon:', error));
+}
 
 function deleteLastPokemon() {
   const savedPokemons = loadSavedPokemons();
@@ -71,14 +97,16 @@ function deleteLastPokemon() {
     savePokemonToLocalStorage(savedPokemons);
     displaySavedPokemons();
   } else {
-    alert(`No Pokemon to delete!`);
+    alert(`No Pokémon to delete!`);
   }
 }
 
 //INITIALIZE APP AND BIND EVENT LISTENERS
 function init() {
-  document.getElementById('fetchPokemonBtn').addEventListener('click', fetchPokemon);
-  document.getElementById('deletePokemonBtn').addEventListener('click', deleteLastPokemon);
+document.getElementById('fetchPokemonBtn').addEventListener('click', fetchPokemon);
+document.getElementById('deletePokemonBtn').addEventListener('click', deleteLastPokemon);
+document.getElementById('fetchAllBtn').addEventListener('click', fetchMultiplePokemon);
+document.getElementById('fetchAnyBtn').addEventListener('click', fetchAnyPokemon);
 
 //DISPLAY SAVED POKEMON ON LOAD
   displaySavedPokemons();
@@ -96,9 +124,9 @@ function processWithWorker(pokemon) {
   };
 
   worker.onerror = function(error) {
-    console.error('Error i worker:', error.message);
+    console.error('Error in worker:', error.message);
     worker.terminate(); //TERMINATE THE WORKER IF THERE'S AN ERROR
   };
 }
 
-init();
+init(); 
